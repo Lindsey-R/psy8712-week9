@@ -38,14 +38,13 @@ correlation$p.value
 ## I observe a significant p_value.
 
 # Publication
-## The correlation between upvotes and comments was r(98) = 0.63, p = 0.00. This test was statistically significant.
-
+## The correlation between upvotes and comments was r(98) = 0.62, p = .00. This test was statistically significant.
 ## Write the line
 ## Constructing the message
 message <- sprintf("The correlation between upvotes and comments was r(%d) = %s, p = %s. This test %s statistically significant.",
                    correlation$parameter, 
                    formatC(correlation$estimate, format = 'f', digits = 2, flag = '-'), 
-                   formatC(correlation$p.value, format = 'f', digits = 2, flag = '-'),
+                   sub("^0\\.", ".", formatC(correlation$p.value, format = 'f', digits = 2)),
                    ifelse(correlation$p.value < 0.05, "was", "was not"))
 
 ## Printing the message
