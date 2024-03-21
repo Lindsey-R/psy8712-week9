@@ -56,7 +56,7 @@ summary_result
 
 # Publication
 ## "The results of an ANOVA comparing lengths across sources was F(3, 130) = 1.47, p = .23. This test was not statistically significant."
-## assigne p value first
+## assign p value first
 p_value <- summary_result[[1]]$'Pr(>F)'[1]
 ## Generate the message content
 message <- sprintf("The results of an ANOVA comparing lengths across sources was F(%d, %d) = %.2f, p = %s. This test %s statistically significant.",
