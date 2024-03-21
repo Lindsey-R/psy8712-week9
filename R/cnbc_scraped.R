@@ -55,10 +55,11 @@ summary_result
 ## No significant differences between lengths across sources
 
 # Publication
+p_value <- summary_result[[1]]$'Pr(>F)'[1]
 message <- sprintf("The results of an ANOVA comparing lengths across sources was F(%d, %d) = %.2f, p = %s. This test %s statistically significant.",
                    dfn = summary_result[[1]]$'Df'[1] , 
                    dfd = summary_result[[1]]$'Df'[2], 
                    F_value = summary_result[[1]]$'F value'[1], 
-                   p_value = formatC(summary_result[[1]]$'Pr(>F)'[1], format = 'f', digits = 2, flag = '-'),
-                   ifelse(summary_result[[1]]$'Pr(>F)'[1] < 0.05, "was", "was not"))
+                   p_value =  sub("^0\\.", ".", formatC(p_value, format = 'f', digits = 2)),
+                   ifelse(p_value < 0.05, "was", "was not"))
 message
