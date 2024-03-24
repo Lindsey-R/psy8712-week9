@@ -1,22 +1,22 @@
 # Script Settings and Resources
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-library(jsonlite)
 library(tidyverse)
+library(RedditExtractoR)
 
 # Data Import and Cleaning
 ## Tried but failed to extract all posts published a month ago so I give up
-## Construct the URL
-url <- 'https://oauth.reddit.com/r/rstats/.json?limit=100'
+## Construct the URL 
+url <- find_thread_urls(subreddit="rstats", period = "month")
 ## Make the request 
-json_data <- fromJSON(url, flatten = TRUE)
+content <- get_thread_content(url$url)
   
 ## Extract information
-titles <- json_data$data$children$data.title
-upvotes <- json_data$data$children$data.ups
-comments <- json_data$data$children$data.num_comments
+titles <- content$threads$title
+upvotes <- content$threads$upvotes
+comments <- content$threads$comments
 
 ## Create tbl
-rstats_tbl <- as.tibble(titles) %>%
+rstats_tbl <- as_tibble(titles) %>%
   mutate(upvotes = upvotes,
          comments = comments) %>%
   rename(post = value)
@@ -33,13 +33,12 @@ rstats_tbl %>%
 ## Obtain correlation between upvotes and comments
 correlation <- cor.test(rstats_tbl$upvotes, rstats_tbl$comments)
 correlation$estimate
-## I observe a correlation of 0.628 
+## I observe a correlation of 0.539
 correlation$p.value
 ## I observe a significant p_value.
 
 # Publication
-## The correlation between upvotes and comments was r(98) = 0.62, p = .00. This test was statistically significant.
-## Write the line
+## The correlation between upvotes and comments was r(121) = 0.54, p = .00. This test was statistically significant.
 ## Constructing the message
 message <- sprintf("The correlation between upvotes and comments was r(%d) = %s, p = %s. This test %s statistically significant.",
                    correlation$parameter, 
