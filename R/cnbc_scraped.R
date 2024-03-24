@@ -18,6 +18,7 @@ cnbc_tbl <- data.frame(headline = character(),
                        stringsAsFactors = FALSE) %>%
   as_tibble()
 
+# Setting for loop
 for (i in 1:length(sections)){
   ## Read in html pages
   page <- read_html(urls[i])
@@ -30,10 +31,9 @@ for (i in 1:length(sections)){
   ## Generate source variable
   source <- sections[i]
   ## Combine all variables into a tibble
-  page_tbl <- data.frame(headline = page_text,
-                         length = length,
-                         source = source) %>%
-    as.tibble()
+  page_tbl <- tibble(headline = page_text,
+                     length = length,
+                     source = source) 
   # Combine the tibble with existing tibble
   cnbc_tbl <- rbind(cnbc_tbl, page_tbl)
   
@@ -52,10 +52,10 @@ anova_result <- aov(length ~ source, data = cnbc_tbl)
 ## Show result summary
 summary_result <- summary(anova_result)
 summary_result
-## No significant differences between lengths across sources
+## Significant differences between lengths across sources
 
 # Publication
-## "The results of an ANOVA comparing lengths across sources was F(3, 130) = 1.47, p = .23. This test was not statistically significant."
+##  "The results of an ANOVA comparing lengths across sources was F(3, 130) = 3.23, p = .02. This test was statistically significant."
 ## assign p value first
 p_value <- summary_result[[1]]$'Pr(>F)'[1]
 ## Generate the message content
