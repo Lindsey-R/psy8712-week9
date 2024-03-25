@@ -2,14 +2,75 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(tidyverse)
 library(RedditExtractoR)
+library(jsonlite)
 
 # Data Import and Cleaning
 ## Tried but failed to extract all posts published a month ago so I give up
 ## Construct the URL 
-url <- find_thread_urls(subreddit="rstats", period = "month")
+## url <- find_thread_urls(subreddit="rstats", period = "month")
+## Should add sort so sort based on time; other wise, sort based on "top" and get less results
+url <- find_thread_urls(subreddit="rstats", sort_by = "new", period = "month")
+## WILL TAKE A LONG LONG TIME
 ## Make the request 
 content <- get_thread_content(url$url)
+
+# Do it with JSON DON'T WORK ----
+# url_json <- "https://www.reddit.com/r/rstats/new/.json?limit=100"
+# first_df <- fromJSON(url_json, flatten = TRUE)
+# reddit_data <- first_df$data$children$data
+# next_search <- paste0("after =", first_df$data$after)
+# # Find the newest data
+# newest_date <- first_df$data$children$data[1, "created"]
+# # Find date a month ago
+# month_ago <- (Sys.Date() - 30) %>% as.POSIXct() %>% as.numeric()
+# 
+# while (newest_date > month_ago) {
+#   next_df <- fromJSON(
+#     flatten = TRUE,
+#     paste0(url_json, "&", next_search)
+#   )
+#   newest_date <- next_df$data$children$data[1, "created"]
+#   reddit_data <- bind_rows(reddit_data, next_df$data$children$data)
+# }
+
+# Try with JSON DON'T RUN ---- 
+after <- NULL
+posts_list <- data.frame()
+one_month_ago <- (Sys.Date() - 30) %>% as.POSIXct() %>% as.numeric()  # Date one month ago
+
+# Loop to fetch posts until you reach posts older than one month
+repeat {
+  # Construct the URL
+  url <- paste0('https://oauth.reddit.com/r/rstats/new/.json?limit=100', ifelse(is.null(after), '', paste0('&after=', after)))
   
+  # Make the request
+  response <- fromJSON(url, flatten = TRUE)
+  
+  posts_batch <- response$data$children
+  posts_date <- response$data$children$data.created_utc
+  posts_list <- bind_rows(posts_list, posts_batch)
+    
+    # Check the date of the last post in the batch
+    last_post_date <- max(posts_date)
+    
+    # Update the 'after' parameter for the next request
+    after <- response$data$after
+  
+    # Break the loop if the last post is older than one month
+    if (last_post_date < one_month_ago) {
+      break
+    }
+}
+
+# Extract the desired information from the posts
+titles <- posts_list$data.title
+upvotes <- posts_list$data.ups
+comments <- posts_list$data.num_comments
+
+# Create a dataframe
+rstats_tbl_json <- data.frame(post = titles, upvotes = upvotes, comments = comments)
+  
+# Back to HW ----
 ## Extract information
 titles <- content$threads$title
 upvotes <- content$threads$upvotes
