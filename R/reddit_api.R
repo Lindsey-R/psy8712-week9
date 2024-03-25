@@ -33,16 +33,16 @@ rstats_tbl %>%
 ## Obtain correlation between upvotes and comments
 correlation <- cor.test(rstats_tbl$upvotes, rstats_tbl$comments)
 correlation$estimate
-## I observe a correlation of 0.539
+## I observe a correlation of 0.518
 correlation$p.value
 ## I observe a significant p_value.
 
 # Publication
-## The correlation between upvotes and comments was r(121) = 0.54, p = .00. This test was statistically significant.
+## The correlation between upvotes and comments was r(122) = .52, p = .00. This test was statistically significant.
 ## Constructing the message
 message <- sprintf("The correlation between upvotes and comments was r(%d) = %s, p = %s. This test %s statistically significant.",
                    correlation$parameter, 
-                   formatC(correlation$estimate, format = 'f', digits = 2, flag = '-'), 
+                   sub("^0\\.", ".", formatC(correlation$estimate, format = 'f', digits = 2)),
                    sub("^0\\.", ".", formatC(correlation$p.value, format = 'f', digits = 2)),
                    ifelse(correlation$p.value < 0.05, "was", "was not"))
 

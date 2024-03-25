@@ -43,8 +43,7 @@ for (i in 1:length(sections)){
 ## I choose a boxplot to show the mean differences on length between sources
 cnbc_tbl %>%
   ggplot(aes(x = source, y = length)) +
-  geom_boxplot() +
-  geom_violin(alpha = 0.5)
+  geom_boxplot() 
 
 # Analysis
 ## Conduct anova
